@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GramTrack - Rural Housing & Panchayat Monitoring System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lavender: {
+                            50: '#F8F6FF',
+                            100: '#F4EEFF',
+                            200: '#EAE5F5',
+                            300: '#D5C9FB',
+                            400: '#B69EFE',
+                            500: '#9B7BFF',
+                            600: '#7654D6',
+                            700: '#5C39B7',
+                            800: '#432688',
+                            900: '#2C175A'
+                        },
+                        textMain: '#24213A',
+                        textMuted: '#77748B'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #24213A; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F8F6FF; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #D5C9FB; border-radius: 9999px; }
+        .watermark-overlay {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(2px);
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 text-[#24213A] antialiased flex flex-col">
+
+    <!-- TOP NOTIFICATION BANNER / STATUS -->
+    <div id="topBanner" class="hidden bg-emerald-600 text-white text-xs font-medium py-1.5 px-4 text-center justify-between items-center transition-all">
+        <span id="topBannerText">Database Integrity Verified • Security Status: HMAC Operational</span>
+        <button onclick="dismissBanner()" class="text-white hover:text-emerald-100 font-bold ml-2">✕</button>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="appContainer" class="flex-1 flex flex-col min-h-screen">
+
+        <!-- ================= LOGIN PAGE ================= -->
+        <div id="loginPage" class="flex-1 flex items-center justify-center bg-gradient-to-br from-white via-lavender-50 to-lavender-100 p-4 md:p-8">
+            <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Left Info Section -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-lavender-500 text-white rounded-2xl shadow-lg shadow-lavender-500/30">
+                            <i data-lucide="building-2" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-lavender-900 tracking-tight">GramTrack 2026</h1>
+                            <p class="text-xs font-semibold text-lavender-600 uppercase tracking-wider">Rural Housing & Panchayat Monitoring</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-textMuted text-sm leading-relaxed">
+                        Production-grade portal featuring automated multi-factor beneficiary deduplication, tamper-evident watermarked geotag inspection records, and end-to-end cryptographic audit trails.
+                    </p>
+
+                    <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-lavender-200 shadow-sm space-y-3">
+                        <div class="flex items-center space-x-3 text-xs text-lavender-900 font-semibold">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+                            <span>Cryptographic Multi-factor Deduplication</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs text-lavender-900 font-semibold">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-lavender-500"></i>
+                            <span>15m Spatial & Phonetic Match Radar</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs text-lavender-900 font-semibold">
+                            <i data-lucide="lock" class="w-5 h-5 text-indigo-500"></i>
+                            <span>SHA-256 HMAC Stage-Lock Audit Trace</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 text-xs text-textMuted flex items-center justify-between">
+                        <span>Ministry of Panchayati Raj System v4.8</span>
+                        <span class="text-emerald-600 font-medium">● Server Online</span>
+                    </div>
+                </div>
+
+                <!-- Right Login Form Card -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-lavender-200 space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-textMain">Portal Sign In</h2>
+                        <p class="text-xs text-textMuted mt-1">Select a demo persona or enter official credentials</p>
+                    </div>
+
+                    <!-- Quick Demo Credentials Picker -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-textMuted uppercase tracking-wider block">Select Preset Role (Click to fill)</label>
+                        <div class="grid grid-cols-2 gap-2 text-left">
+                            <button onclick="fillLogin('ADMIN001', 'Admin@2026')" class="p-3 text-left rounded-xl border border-lavender-200 bg-lavender-50 hover:bg-lavender-100 transition group">
+                                <div class="font-bold text-xs text-lavender-900 group-hover:text-lavender-600 flex items-center justify-between">
+                                    <span>Administrator</span>
+                                    <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="text-[10px] text-textMuted mt-0.5">ADMIN001 • Full Access</div>
+                            </button>
+                            <button onclick="fillLogin('DIST_OFFICER_01', 'District@2026')" class="p-3 text-left rounded-xl border border-lavender-200 bg-lavender-50 hover:bg-lavender-100 transition group">
+                                <div class="font-bold text-xs text-lavender-900 group-hover:text-lavender-600 flex items-center justify-between">
+                                    <span>District Officer</span>
+                                    <i data-lucide="file-check-2" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="text-[10px] text-textMuted mt-0.5">DIST_OFFICER_01 • Approvals</div>
+                            </button>
+                            <button onclick="fillLogin('INSPECTOR_SURESH', 'Inspect@2026')" class="p-3 text-left rounded-xl border border-lavender-200 bg-lavender-50 hover:bg-lavender-100 transition group">
+                                <div class="font-bold text-xs text-lavender-900 group-hover:text-lavender-600 flex items-center justify-between">
+                                    <span>Field Inspector</span>
+                                    <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="text-[10px] text-textMuted mt-0.5">INSPECTOR_SURESH • Geotag</div>
+                            </button>
+                            <button onclick="fillLogin('PRADHAN_RAMESH', 'Pradhan@2026')" class="p-3 text-left rounded-xl border border-lavender-200 bg-lavender-50 hover:bg-lavender-100 transition group">
+                                <div class="font-bold text-xs text-lavender-900 group-hover:text-lavender-600 flex items-center justify-between">
+                                    <span>Panchayat Pradhan</span>
+                                    <i data-lucide="home" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="text-[10px] text-textMuted mt-0.5">PRADHAN_RAMESH • Local Works</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-textMain mb-1">Official Unique User ID</label>
+                            <div class="relative">
+                                <i data-lucide="user" class="w-4 h-4 absolute left-3 top-3 text-textMuted"></i>
+                                <input type="text" id="loginUserId" required placeholder="e.g. ADMIN001" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-lavender-200 focus:outline-none focus:ring-2 focus:ring-lavender-500 text-xs font-mono">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-textMain mb-1">Password</label>
+                            <div class="relative">
+                                <i data-lucide="key" class="w-4 h-4 absolute left-3 top-3 text-textMuted"></i>
+                                <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-9 pr-10 py-2.5 rounded-xl border border-lavender-200 focus:outline-none focus:ring-2 focus:ring-lavender-500 text-xs font-mono">
+                                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3 text-textMuted hover:text-textMain">
+                                    <i data-lucide="eye" id="passwordEyeIcon" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs">
+                            <label class="flex items-center space-x-2 text-textMuted cursor-pointer">
+                                <input type="checkbox" id="rememberMe" checked class="rounded border-lavender-300 text-lavender-600 focus:ring-lavender-500">
+                                <span>Remember active session</span>
+                            </label>
+                            <a href="#" onclick="showModal('Forgot Password', 'Please contact the State Nodal Officer at nodal-support@gramtrack.gov.in for credentials recovery and biometric reset.')" class="text-lavender-600 font-semibold hover:underline">Need Help?</a>
+                        </div>
+
+                        <div id="loginError" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                            <span id="loginErrorText">Invalid User ID or Password.</span>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-lavender-600 hover:bg-lavender-700 text-white font-semibold rounded-xl transition shadow-lg shadow-lavender-600/25 flex items-center justify-center space-x-2 text-sm">
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
+                            <span>Authenticate & Launch Workspace</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= MAIN APP WORKSPACE ================= -->
+        <div id="mainWorkspace" class="hidden flex-1 flex flex-col min-h-screen bg-slate-50">
+
+            <!-- NAVIGATION HEADER BAR -->
+            <header class="bg-white border-b border-lavender-200 sticky top-0 z-30 shadow-sm">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-16">
+                        
+                        <!-- Logo & Title -->
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2 bg-lavender-600 text-white rounded-xl shadow-md">
+                                <i data-lucide="building-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <span class="text-base font-bold text-textMain tracking-tight">GramTrack</span>
+                                <span class="hidden sm:inline text-xs font-semibold text-lavender-600 bg-lavender-100 px-2 py-0.5 rounded-full ml-2">PRO 2026</span>
+                            </div>
+                        </div>
+
+                        <!-- Top Right Active User & System Control -->
+                        <div class="flex items-center space-x-3">
+                            
+                            <!-- Mobile Inspector Trigger -->
+                            <button onclick="toggleMobileSimulator()" class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-xl border border-lavender-200 bg-lavender-50 hover:bg-lavender-100 text-xs font-semibold text-lavender-700 transition">
+                                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                                <span>Field Mobile Sim</span>
+                            </button>
+
+                            <!-- User Role Badge -->
+                            <div class="flex items-center space-x-2 bg-lavender-50 border border-lavender-200 px-3 py-1.5 rounded-xl">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <div class="text-left">
+                                    <div id="activeUserName" class="text-xs font-bold text-textMain leading-tight">Admin User</div>
+                                    <div id="activeUserRole" class="text-[10px] text-textMuted uppercase font-semibold">Administrator</div>
+                                </div>
+                            </div>
+
+                            <!-- Reset Data & Seed Controls -->
+                            <div class="relative group">
+                                <button class="p-2 rounded-xl text-textMuted hover:text-textMain hover:bg-lavender-100 border border-transparent hover:border-lavender-200">
+                                    <i data-lucide="settings" class="w-4 h-4"></i>
+                                </button>
+                                <div class="absolute right-0 top-full mt-1 w-48 bg-white border border-lavender-200 rounded-xl shadow-lg p-2 hidden group-hover:block z-50 text-xs space-y-1">
+                                    <button onclick="resetData()" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-rose-50 text-rose-600 font-medium">Reset System State</button>
+                                    <button onclick="seedDemoData()" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-lavender-50 text-lavender-700 font-medium">Seed Fresh Records</button>
+                                    <button onclick="exportAuditLogJSON()" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 text-textMain font-medium">Export Audit JSON</button>
+                                </div>
+                            </div>
+
+                            <!-- Logout Button -->
+                            <button onclick="handleLogout()" class="p-2 rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-100 transition" title="Sign Out">
+                                <i data-lucide="log-out" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB NAVIGATION LINKS -->
+                    <div class="flex space-x-1 sm:space-x-4 border-t border-lavender-100 overflow-x-auto custom-scrollbar text-xs font-semibold text-textMuted py-1">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn active-tab flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button onclick="switchTab('beneficiaries')" id="nav-beneficiaries" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>Housing Beneficiaries</span>
+                        </button>
+                        <button onclick="switchTab('deduplication')" id="nav-deduplication" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap relative">
+                            <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i>
+                            <span>Deduplication Engine</span>
+                            <span id="dedupBadgeCount" class="ml-1 bg-amber-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">2</span>
+                        </button>
+                        <button onclick="switchTab('panchayat')" id="nav-panchayat" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="landmark" class="w-4 h-4"></i>
+                            <span>Panchayat Works</span>
+                        </button>
+                        <button onclick="switchTab('inspections')" id="nav-inspections" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                            <span>Verification & Photos</span>
+                        </button>
+                        <button onclick="switchTab('instalments')" id="nav-instalments" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="badge-indian-rupee" class="w-4 h-4"></i>
+                            <span>Fund Disbursal Queue</span>
+                        </button>
+                        <button onclick="switchTab('audit')" id="nav-audit" class="tab-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition whitespace-nowrap">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            <span>Security Audit Log</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB CONTENT AREA -->
+            <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+                <!-- 1. DASHBOARD VIEW -->
+                <div id="view-dashboard" class="tab-view space-y-6">
+                    
+                    <!-- Top Metrics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-lavender-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-textMuted font-medium uppercase tracking-wider">Total Beneficiaries</p>
+                                <h3 id="statTotalBeneficiaries" class="text-2xl font-bold text-textMain mt-1">12</h3>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium flex items-center">
+                                    <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> Active Across 4 Gram Panchayats
+                                </p>
+                            </div>
+                            <div class="p-3 bg-lavender-100 text-lavender-600 rounded-2xl">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-lavender-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-textMuted font-medium uppercase tracking-wider">Duplicate Flags</p>
+                                <h3 id="statDuplicateFlags" class="text-2xl font-bold text-amber-600 mt-1">2 Pending</h3>
+                                <p class="text-[11px] text-amber-600 mt-1 font-medium flex items-center">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i> 1 Critical Identity Match
+                                </p>
+                            </div>
+                            <div class="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+                                <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-lavender-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-textMuted font-medium uppercase tracking-wider">Completed Inspections</p>
+                                <h3 id="statInspectionsCount" class="text-2xl font-bold text-textMain mt-1">8 Geotagged</h3>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium flex items-center">
+                                    <i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i> 100% Watermark Signed
+                                </p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
+                                <i data-lucide="check-circle" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-lavender-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-textMuted font-medium uppercase tracking-wider">Funds Disbursed</p>
+                                <h3 id="statFundsDisbursed" class="text-2xl font-bold text-textMain mt-1">₹ 28,50,000</h3>
+                                <p class="text-[11px] text-textMuted mt-1 font-medium">Direct Bank Transfer (DBT)</p>
+                            </div>
+                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
+                                <i data-lucide="badge-indian-rupee" class="w-6 h-6"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts & Critical Notice Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <!-- Stage Progress Chart -->
+                        <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-lavender-200 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-bold text-textMain">Housing Construction Progress</h4>
+                                    <p class="text-xs text-textMuted">Stage wise breakdown for rural beneficiaries</p>
+                                </div>
+                                <span class="text-xs bg-lavender-100 text-lavender-700 px-2.5 py-1 rounded-full font-semibold">PMAY-G Verified</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartConstructionStages"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Duplicate Security Alert Callout -->
+                        <div class="lg:col-span-5 bg-gradient-to-br from-lavender-900 to-lavender-800 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-semibold flex items-center space-x-1">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                                        <span>Security System Alert</span>
+                                    </span>
+                                    <span class="text-[10px] text-lavender-300">Updated Realtime</span>
+                                </div>
+                                <h3 class="text-lg font-bold mt-4">Multi-factor Deduplication Engine Active</h3>
+                                <p class="text-xs text-lavender-200 mt-2 leading-relaxed">
+                                    The engine continuously scans Aadhaar identity hashes, phonetic name equivalencies, multi-scheme household overlapping, and spatial proximity (&lt;15m geotag boundary).
+                                </p>
+                            </div>
+
+                            <div class="bg-white/10 p-4 rounded-xl border border-white/10 space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-lavender-200">Active High-Risk Case:</span>
+                                    <span class="font-bold text-amber-300">Aadhaar Identity Conflict</span>
+                                </div>
+                                <p class="text-[11px] text-lavender-300">Beneficiary 'Sunil Kumar' shares exact Aadhaar with 'Sunil K. Verma' (100% Match Confidence).</p>
+                                <button onclick="switchTab('deduplication')" class="w-full mt-2 py-2 bg-lavender-500 hover:bg-lavender-600 text-white rounded-lg text-xs font-bold transition">
+                                    Open Deduplication Center
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Panchayat Projects Overview -->
+                    <div class="bg-white p-6 rounded-2xl border border-lavender-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-textMain">Active Panchayat Infrastructure Works</h4>
+                                <p class="text-xs text-textMuted">Community roads, solar water projects, and Gram Sabha facilities</p>
+                            </div>
+                            <button onclick="switchTab('panchayat')" class="text-xs font-semibold text-lavender-600 hover:underline">View All Projects →</button>
+                        </div>
+                        <div id="dashboardPanchayatList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. HOUSING BENEFICIARIES VIEW -->
+                <div id="view-beneficiaries" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-textMain">Rural Housing Beneficiaries Directory</h2>
+                            <p class="text-xs text-textMuted">Comprehensive portal tracking stage milestones and verification statuses</p>
+                        </div>
+                        <div class="flex items-center space-x-2 w-full sm:w-auto">
+                            <input type="text" id="searchBeneficiary" oninput="renderBeneficiaries()" placeholder="Search by name, Aadhaar, village..." class="px-3 py-2 rounded-xl border border-lavender-200 text-xs w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-lavender-500">
+                            <button onclick="openAddBeneficiaryModal()" class="px-4 py-2 bg-lavender-600 text-white text-xs font-semibold rounded-xl hover:bg-lavender-700 transition flex items-center space-x-1 shrink-0">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>Add Beneficiary</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <span class="text-textMuted font-medium">Filter Stage:</span>
+                        <button onclick="filterBeneficiariesByStage('ALL')" class="stage-filter-btn active-filter px-3 py-1 rounded-full border border-lavender-200">All</button>
+                        <button onclick="filterBeneficiariesByStage('Foundation')" class="stage-filter-btn px-3 py-1 rounded-full border border-lavender-200">Foundation</button>
+                        <button onclick="filterBeneficiariesByStage('Plinth')" class="stage-filter-btn px-3 py-1 rounded-full border border-lavender-200">Plinth</button>
+                        <button onclick="filterBeneficiariesByStage('Lintel')" class="stage-filter-btn px-3 py-1 rounded-full border border-lavender-200">Lintel</button>
+                        <button onclick="filterBeneficiariesByStage('Completed')" class="stage-filter-btn px-3 py-1 rounded-full border border-lavender-200">Completed</button>
+                    </div>
+
+                    <!-- Beneficiaries Table -->
+                    <div class="bg-white rounded-2xl border border-lavender-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-lavender-50 border-b border-lavender-200 font-semibold text-textMain uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Beneficiary ID & Name</th>
+                                        <th class="p-4">Gram Panchayat</th>
+                                        <th class="p-4">Aadhaar (Hashed)</th>
+                                        <th class="p-4">Construction Stage</th>
+                                        <th class="p-4">Verification State</th>
+                                        <th class="p-4">Disbursed Funds</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="beneficiaryTableBody" class="divide-y divide-lavender-100 font-medium">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ENHANCED PRACTICAL DEDUPLICATION ENGINE VIEW -->
+                <div id="view-deduplication" class="tab-view hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-lavender-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <h2 class="text-lg font-bold text-textMain">Multi-Factor Deduplication Verification Queue</h2>
+                                    <span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-bold">Practical Risk Engine Active</span>
+                                </div>
+                                <p class="text-xs text-textMuted mt-0.5">Automated algorithmic analysis detecting duplicate beneficiary claims across Aadhaar, soundex phonetics, household overlap, and 15m GPS proximity.</p>
+                            </div>
+                            <button onclick="runDeduplicationScan()" class="px-4 py-2 bg-lavender-600 text-white rounded-xl text-xs font-semibold hover:bg-lavender-700 transition flex items-center space-x-2 shrink-0">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                <span>Re-Scan Entire DB</span>
+                            </button>
+                        </div>
+
+                        <!-- Rule Explanation Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                            <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs">
+                                <span class="font-bold text-rose-800 block">Exact Aadhaar Match</span>
+                                <span class="text-rose-600 text-[11px]">100% Confidence • Critical Flag</span>
+                            </div>
+                            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs">
+                                <span class="font-bold text-amber-800 block">Phonetic Name & Village</span>
+                                <span class="text-amber-600 text-[11px]">75% Confidence • Soundex Match</span>
+                            </div>
+                            <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs">
+                                <span class="font-bold text-indigo-800 block">Multi-Scheme Overlap</span>
+                                <span class="text-indigo-600 text-[11px]">85% Confidence • Cross-Scheme ID</span>
+                            </div>
+                            <div class="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs">
+                                <span class="font-bold text-purple-800 block">GPS Boundary (&lt;15m)</span>
+                                <span class="text-purple-600 text-[11px]">90% Confidence • Spatial Cluster</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Queue List -->
+                    <div id="dedupQueueList" class="space-y-4">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- 4. PANCHAYAT WORKS VIEW -->
+                <div id="view-panchayat" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-textMain">Panchayat Public Infrastructure Works</h2>
+                            <p class="text-xs text-textMuted">Community infrastructure tracking under 15th Finance Commission & State Grants</p>
+                        </div>
+                        <button onclick="openAddPanchayatModal()" class="px-4 py-2 bg-lavender-600 text-white text-xs font-semibold rounded-xl hover:bg-lavender-700 transition flex items-center space-x-1">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>New Project Proposal</span>
+                        </button>
+                    </div>
+
+                    <div id="panchayatProjectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- 5. VERIFICATION & INSPECTIONS VIEW -->
+                <div id="view-inspections" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-textMain">Field Inspection Evidence & Watermarked Photos</h2>
+                            <p class="text-xs text-textMuted">Cryptographically watermarked photographic evidence submitted by inspectors</p>
+                        </div>
+                        <button onclick="toggleMobileSimulator()" class="px-4 py-2 bg-lavender-600 text-white text-xs font-semibold rounded-xl hover:bg-lavender-700 transition flex items-center space-x-2">
+                            <i data-lucide="smartphone" class="w-4 h-4"></i>
+                            <span>Launch Mobile Inspection Camera</span>
+                        </button>
+                    </div>
+
+                    <div id="inspectionsGallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- 6. INSTALMENTS DISBURSAL QUEUE -->
+                <div id="view-instalments" class="tab-view hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-lavender-200 shadow-sm space-y-2">
+                        <h2 class="text-lg font-bold text-textMain">Stage-Linked Fund Release Queue</h2>
+                        <p class="text-xs text-textMuted">Instalments are locked until inspection photos are verified and deduplication flags cleared.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-lavender-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-lavender-50 border-b border-lavender-200 font-semibold text-textMain uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Beneficiary</th>
+                                        <th class="p-4">Target Stage</th>
+                                        <th class="p-4">Instalment Amount</th>
+                                        <th class="p-4">Inspection State</th>
+                                        <th class="p-4">Deduplication Status</th>
+                                        <th class="p-4">Approval State</th>
+                                        <th class="p-4 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="instalmentTableBody" class="divide-y divide-lavender-100 font-medium">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. SECURITY AUDIT LOG VIEW -->
+                <div id="view-audit" class="tab-view hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h2 class="text-lg font-bold text-textMain">Cryptographic System Audit Log</h2>
+                                <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold">Immutable Ledger</span>
+                            </div>
+                            <p class="text-xs text-textMuted mt-0.5">Every login, stage approval, duplicate override, and payment generates a SHA-256 style signature record.</p>
+                        </div>
+                        <button onclick="exportAuditLogJSON()" class="px-4 py-2 border border-lavender-300 bg-white text-textMain hover:bg-lavender-50 text-xs font-semibold rounded-xl transition flex items-center space-x-1">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Export Audit Trail (JSON)</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-lavender-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-lavender-50 border-b border-lavender-200 font-semibold text-textMain uppercase tracking-wider">
+                                    <tr>
+                                        <th class="p-3">Timestamp</th>
+                                        <th class="p-3">User ID & Role</th>
+                                        <th class="p-3">Action Event</th>
+                                        <th class="p-3">Target Reference</th>
+                                        <th class="p-3">Cryptographic SHA-256 Hash</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody" class="divide-y divide-lavender-100 text-[11px]">
+                                    <!-- Dynamic audit rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- ================= MOBILE FIELD INSPECTOR SIMULATOR SLIDE-OVER ================= -->
+        <div id="mobileSimulator" class="fixed inset-y-0 right-0 w-full max-w-sm bg-slate-900 text-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+            <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="smartphone" class="w-5 h-5 text-lavender-400"></i>
+                    <div>
+                        <h3 class="text-xs font-bold text-white">GramTrack Mobile Inspector</h3>
+                        <p class="text-[10px] text-slate-400">Field Geotag Capture Portal</p>
+                    </div>
+                </div>
+                <button onclick="toggleMobileSimulator()" class="p-1 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Offline / Online Indicator Bar -->
+            <div class="p-2 bg-slate-950 flex items-center justify-between text-xs px-4">
+                <div class="flex items-center space-x-2">
+                    <span id="mobileNetworkDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <span id="mobileNetworkStatus" class="font-bold text-emerald-400">Online Sync Active</span>
+                </div>
+                <button onclick="toggleMobileNetwork()" id="toggleNetBtn" class="text-[10px] px-2 py-0.5 rounded border border-slate-700 text-slate-300 hover:bg-slate-800">
+                    Simulate Offline
+                </button>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+                
+                <!-- Target Selection -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-300">Select Beneficiary for Inspection</label>
+                    <select id="simBeneficiarySelect" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-lavender-500">
+                        <!-- Dynamic options -->
+                    </select>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-300">Inspection Stage</label>
+                    <select id="simStageSelect" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-lavender-500">
+                        <option value="Foundation">Foundation</option>
+                        <option value="Plinth">Plinth Stage</option>
+                        <option value="Lintel">Lintel Stage</option>
+                        <option value="Completion">Completion / Roof</option>
+                    </select>
+                </div>
+
+                <!-- GPS Location Capture -->
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-300 font-semibold text-[11px]">GPS Geotag Status</span>
+                        <button onclick="acquireBrowserGPS()" class="text-[10px] bg-lavender-600 hover:bg-lavender-700 px-2 py-1 rounded text-white font-semibold">
+                            Get Real GPS
+                        </button>
+                    </div>
+                    <div class="font-mono text-[11px] text-slate-300 bg-slate-900 p-2 rounded border border-slate-700 space-y-1">
+                        <div>LAT: <span id="simLat" class="text-emerald-400">26.8467° N</span></div>
+                        <div>LNG: <span id="simLng" class="text-emerald-400">80.9462° E</span></div>
+                        <div>ACCURACY: <span id="simAcc" class="text-slate-400">± 3.2 meters</span></div>
+                    </div>
+                </div>
+
+                <!-- Camera Simulator -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-slate-300">Site Photo Capture</label>
+                    <div id="simPhotoPreview" class="w-full h-40 bg-slate-950 border-2 border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center text-slate-500 relative overflow-hidden">
+                        <i data-lucide="camera" class="w-8 h-8 mb-1"></i>
+                        <span class="text-[10px]">No Photo Captured</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="captureSimPhoto('foundation')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-[11px] text-slate-200 font-medium">Sample Sample 1</button>
+                        <button onclick="captureSimPhoto('completion')" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-[11px] text-slate-200 font-medium">Sample Sample 2</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-300">Inspector Quality Remarks</label>
+                    <textarea id="simRemarks" rows="2" placeholder="e.g. Pillar alignment verified, curing process complete..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-2.5 focus:outline-none text-xs mt-1"></textarea>
+                </div>
+
+                <button onclick="submitSimInspection()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-xs">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span>Submit & Generate Watermarked Geotag</span>
+                </button>
+
+                <!-- Offline Pending Counter -->
+                <div id="offlineQueueContainer" class="hidden bg-amber-950/40 border border-amber-800/50 p-3 rounded-xl text-[11px] text-amber-300">
+                    <span id="offlineQueueCount">0</span> inspection(s) saved in local offline queue. Switch to Online to auto-sync.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GLOBAL MODAL DIALOG CONTAINER -->
+    <div id="globalModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-lavender-200 overflow-hidden space-y-4 p-6 relative">
+            <div class="flex items-center justify-between border-b border-lavender-100 pb-3">
+                <h3 id="modalTitle" class="text-base font-bold text-textMain">Modal Title</h3>
+                <button onclick="closeModal()" class="text-textMuted hover:text-textMain p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="text-xs text-textMuted space-y-3">
+                <!-- Dynamic Content -->
+            </div>
+            <div id="modalFooter" class="flex justify-end space-x-2 pt-2 border-t border-lavender-100">
+                <button onclick="closeModal()" class="px-4 py-2 bg-lavender-100 text-lavender-900 rounded-xl text-xs font-semibold hover:bg-lavender-200">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEDUPLICATION SIDE-BY-SIDE COMPARISON MODAL -->
+    <div id="dedupModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-lavender-200 overflow-hidden space-y-4 p-6 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-lavender-100 pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-textMain flex items-center space-x-2">
+                        <i data-lucide="shield-alert" class="w-5 h-5 text-amber-500"></i>
+                        <span>Duplicate Conflict Resolution Center</span>
+                    </h3>
+                    <p class="text-xs text-textMuted">Side-by-side verification of existing vs flagged beneficiary record</p>
+                </div>
+                <button onclick="closeDedupModal()" class="text-textMuted hover:text-textMain p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="dedupModalBody" class="space-y-4">
+                <!-- Dynamically populated comparison layout -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION CORE LOGIC -->
+    <script>
+        // ================= GLOBAL STATE =================
+        const ACCOUNTS = {
+            'ADMIN001': { pass: 'Admin@2026', name: 'Rajesh Sharma', role: 'Administrator', perms: ['all'] },
+            'DIST_OFFICER_01': { pass: 'District@2026', name: 'Dr. Anita Verma', role: 'District Officer', perms: ['approve', 'dedup', 'instalments'] },
+            'INSPECTOR_SURESH': { pass: 'Inspect@2026', name: 'Suresh Kumar', role: 'Field Inspector', perms: ['inspect'] },
+            'PRADHAN_RAMESH': { pass: 'Pradhan@2026', name: 'Ramesh Patel', role: 'Panchayat Pradhan', perms: ['submit_works'] }
+        };
+
+        let currentUser = null;
+        let activeTab = 'dashboard';
+        let currentFilterStage = 'ALL';
+        let isMobileOnline = true;
+        let simCapturedPhotoUrl = null;
+        let chartInstance = null;
+
+        // Data Models
+        let beneficiaries = [];
+        let deduplicationQueue = [];
+        let panchayatProjects = [];
+        let inspectionRecords = [];
+        let instalmentQueue = [];
+        let auditLogs = [];
+        let offlineInspectionQueue = [];
+
+        // Sample Watermark Placeholder Base64 / SVG Canvas generator
+        function generateWatermarkedImageData(title, stage, lat, lng, inspector, time, hash) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+
+            // Background simulation
+            const grad = ctx.createLinearGradient(0,0,600,400);
+            grad.addColorStop(0, '#1e293b');
+            grad.addColorStop(1, '#334155');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,600,400);
+
+            // House visual shape representation
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(150, 180, 300, 180);
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(130, 180);
+            ctx.lineTo(300, 90);
+            ctx.lineTo(470, 180);
+            ctx.fill();
+
+            // Door & Window
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(270, 260, 60, 100);
+            ctx.fillRect(180, 220, 60, 60);
+
+            // Security Watermark Overlay
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+            ctx.fillRect(0, 270, 600, 130);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(`GRAMTRACK SECURITY WATERMARK • ${title.toUpperCase()}`, 20, 292);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '11px monospace';
+            ctx.fillText(`STAGE: ${stage} | INSPECTOR ID: ${inspector}`, 20, 314);
+            ctx.fillText(`GPS LAT/LNG: ${lat}° N, ${lng}° E (Accuracy ±3.0m)`, 20, 334);
+            ctx.fillText(`TIMESTAMP: ${time}`, 20, 354);
+
+            ctx.fillStyle = '#a78bfa';
+            ctx.fillText(`HMAC SHA-256: ${hash}`, 20, 376);
+
+            return canvas.toDataURL('image/jpeg', 0.85);
+        }
+
+        // Generate SHA-256 Mock String
+        function generateHashString(seed) {
+            let hash = 0;
+            const str = seed + Date.now().toString() + Math.random().toString();
+            for (let i = 0; i < str.length; i++) {
+                hash = (hash << 5) - hash + str.charCodeAt(i);
+                hash |= 0;
+            }
+            const hex = Math.abs(hash).toString(16).padStart(8, '0');
+            return `0x8f4a${hex}e92b7c4d110f${hex}`;
+        }
+
+        // ================= INITIALIZATION & SEEDING =================
+        window.onload = function() {
+            lucide.createIcons();
+            loadSession();
+            if (!currentUser) {
+                showLoginPage();
+            } else {
+                initAppData();
+                showWorkspace();
+            }
+        };
+
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainWorkspace').classList.add('hidden');
+        }
+
+        function showWorkspace() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainWorkspace').classList.remove('hidden');
+            document.getElementById('activeUserName').innerText = currentUser.name;
+            document.getElementById('activeUserRole').innerText = currentUser.role;
+            
+            initChart();
+            renderAllViews();
+            populateSimulatorSelects();
+            lucide.createIcons();
+        }
+
+        function loadSession() {
+            const saved = localStorage.getItem('gramtrack_user');
+            if (saved) {
+                try { currentUser = JSON.parse(saved); } catch(e){}
+            }
+        }
+
+        function fillLogin(id, pass) {
+            document.getElementById('loginUserId').value = id;
+            document.getElementById('loginPassword').value = pass;
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('loginPassword');
+            const icon = document.getElementById('passwordEyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('loginUserId').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('loginError');
+
+            if (ACCOUNTS[id] && ACCOUNTS[id].pass === pass) {
+                currentUser = {
+                    id: id,
+                    name: ACCOUNTS[id].name,
+                    role: ACCOUNTS[id].role,
+                    perms: ACCOUNTS[id].perms
+                };
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('gramtrack_user', JSON.stringify(currentUser));
+                }
+                errorEl.classList.add('hidden');
+                
+                // Add Audit Log for Login Event
+                logAuditEvent('USER_LOGIN', `Authenticated user ${currentUser.id} (${currentUser.role})`);
+                
+                initAppData();
+                showWorkspace();
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            logAuditEvent('USER_LOGOUT', `User ${currentUser.id} signed out`);
+            currentUser = null;
+            localStorage.removeItem('gramtrack_user');
+            showLoginPage();
+        }
+
+        function initAppData() {
+            if (localStorage.getItem('gramtrack_beneficiaries')) {
+                beneficiaries = JSON.parse(localStorage.getItem('gramtrack_beneficiaries'));
+                panchayatProjects = JSON.parse(localStorage.getItem('gramtrack_projects'));
+                inspectionRecords = JSON.parse(localStorage.getItem('gramtrack_inspections'));
+                deduplicationQueue = JSON.parse(localStorage.getItem('gramtrack_dedup'));
+                instalmentQueue = JSON.parse(localStorage.getItem('gramtrack_instalments'));
+                auditLogs = JSON.parse(localStorage.getItem('gramtrack_audit'));
+            } else {
+                seedDemoData();
+            }
+        }
+
+        function seedDemoData() {
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+            beneficiaries = [
+                { id: 'BEN-2026-001', name: 'Ramesh Kumar Verma', village: 'Rampur Gram Panchayat', aadhaarHash: 'XXXX-XXXX-8912', stage: 'Lintel', status: 'Verified', fundsDisbursed: 80000, lat: 26.8467, lng: 80.9462, schemeId: 'PMAY-G-9921' },
+                { id: 'BEN-2026-002', name: 'Sunil Kumar', village: 'Rampur Gram Panchayat', aadhaarHash: 'XXXX-XXXX-4431', stage: 'Foundation', status: 'Duplicate Flagged', fundsDisbursed: 30000, lat: 26.8480, lng: 80.9475, schemeId: 'PMAY-G-4412' },
+                { id: 'BEN-2026-003', name: 'Sunil K. Verma', village: 'Rampur Gram Panchayat', aadhaarHash: 'XXXX-XXXX-4431', stage: 'Plinth', status: 'Duplicate Flagged', fundsDisbursed: 0, lat: 26.8481, lng: 80.9476, schemeId: 'STATE-HSG-881' },
+                { id: 'BEN-2026-004', name: 'Sita Devi', village: 'Kalyanpur GP', aadhaarHash: 'XXXX-XXXX-1102', stage: 'Completed', status: 'Verified', fundsDisbursed: 130000, lat: 26.8510, lng: 80.9520, schemeId: 'PMAY-G-3301' },
+                { id: 'BEN-2026-005', name: 'Mahesh Sharma', village: 'Kalyanpur GP', aadhaarHash: 'XXXX-XXXX-9920', stage: 'Plinth', status: 'Verified', fundsDisbursed: 50000, lat: 26.8525, lng: 80.9540, schemeId: 'PMAY-G-5512' },
+                { id: 'BEN-2026-006', name: 'Priya Prasad', village: 'Kalyanpur GP', aadhaarHash: 'XXXX-XXXX-7711', stage: 'Foundation', status: 'Pending Verification', fundsDisbursed: 30000, lat: 26.8530, lng: 80.9545, schemeId: 'PMAY-G-6623' },
+                { id: 'BEN-2026-007', name: 'Amit Singh', village: 'Shivpur GP', aadhaarHash: 'XXXX-XXXX-3344', stage: 'Completed', status: 'Verified', fundsDisbursed: 130000, lat: 26.8600, lng: 80.9600, schemeId: 'PMAY-G-1190' },
+                { id: 'BEN-2026-008', name: 'Geeta Rani', village: 'Shivpur GP', aadhaarHash: 'XXXX-XXXX-5566', stage: 'Lintel', status: 'Verified', fundsDisbursed: 80000, lat: 26.8615, lng: 80.9610, schemeId: 'PMAY-G-2289' },
+                { id: 'BEN-2026-009', name: 'Rajendra Singh', village: 'Bishanpur GP', aadhaarHash: 'XXXX-XXXX-8822', stage: 'Foundation', status: 'Verified', fundsDisbursed: 30000, lat: 26.8700, lng: 80.9700, schemeId: 'PMAY-G-7741' },
+                { id: 'BEN-2026-010', name: 'Kamla Devi', village: 'Bishanpur GP', aadhaarHash: 'XXXX-XXXX-9900', stage: 'Plinth', status: 'Verified', fundsDisbursed: 50000, lat: 26.8720, lng: 80.9720, schemeId: 'PMAY-G-8832' }
+            ];
+
+            panchayatProjects = [
+                { id: 'PRJ-01', name: 'CC Road Construction', village: 'Rampur GP', budget: '₹ 12,50,000', status: 'In Progress', completion: 65, inspector: 'INSPECTOR_SURESH' },
+                { id: 'PRJ-02', name: 'Solar Submersible Pump', village: 'Kalyanpur GP', budget: '₹ 4,20,000', status: 'Completed', completion: 100, inspector: 'INSPECTOR_SURESH' },
+                { id: 'PRJ-03', name: 'Gram Sabha Community Hall', village: 'Shivpur GP', budget: '₹ 25,00,000', status: 'Foundation Stage', completion: 25, inspector: 'INSPECTOR_SURESH' },
+                { id: 'PRJ-04', name: 'Underground Drainage System', village: 'Rampur GP', budget: '₹ 8,90,000', status: 'In Progress', completion: 40, inspector: 'INSPECTOR_SURESH' },
+                { id: 'PRJ-05', name: 'Anganwadi Building Refurbinement', village: 'Bishanpur GP', budget: '₹ 3,50,000', status: 'Approved', completion: 10, inspector: 'INSPECTOR_SURESH' },
+                { id: 'PRJ-06', name: 'Pond Rejuvenation & Beautification', village: 'Shivpur GP', budget: '₹ 6,00,000', status: 'In Progress', completion: 50, inspector: 'INSPECTOR_SURESH' }
+            ];
+
+            const hash1 = generateHashString('INSP01');
+            const img1 = generateWatermarkedImageData('BEN-2026-001', 'Lintel', 26.8467, 80.9462, 'INSPECTOR_SURESH', now, hash1);
+            
+            inspectionRecords = [
+                {
+                    id: 'INSP-101',
+                    benId: 'BEN-2026-001',
+                    benName: 'Ramesh Kumar Verma',
+                    stage: 'Lintel Stage',
+                    inspectorId: 'INSPECTOR_SURESH',
+                    timestamp: now,
+                    lat: 26.8467,
+                    lng: 80.9462,
+                    remarks: 'Pillar alignment and lintel concrete curing verified.',
+                    imageUrl: img1,
+                    hash: hash1,
+                    status: 'Approved'
+                }
+            ];
+
+            deduplicationQueue = [
+                {
+                    id: 'DEDUP-801',
+                    flagType: 'Exact Aadhaar Match',
+                    confidenceScore: 100,
+                    riskLevel: 'CRITICAL',
+                    beneficiaryA: beneficiaries[1], // Sunil Kumar
+                    beneficiaryB: beneficiaries[2], // Sunil K. Verma
+                    matchingFields: ['Aadhaar Hash (XXXX-XXXX-4431)', 'GPS Proximity (12m apart)', 'Gram Panchayat (Rampur GP)'],
+                    status: 'Action Required',
+                    createdDate: now
+                },
+                {
+                    id: 'DEDUP-802',
+                    flagType: 'Phonetic & Spatial Match',
+                    confidenceScore: 78,
+                    riskLevel: 'MEDIUM',
+                    beneficiaryA: beneficiaries[4], // Mahesh Sharma
+                    beneficiaryB: beneficiaries[5], // Priya Prasad
+                    matchingFields: ['Spatial Boundary (14.2m)', 'Gram Panchayat (Kalyanpur GP)'],
+                    status: 'Action Required',
+                    createdDate: now
+                }
+            ];
+
+            instalmentQueue = [
+                { id: 'INST-301', benId: 'BEN-2026-001', benName: 'Ramesh Kumar Verma', stage: 'Stage 3 (Lintel)', amount: '₹ 30,000', status: 'Released', inspectionApproved: true, dedupCleared: true },
+                { id: 'INST-302', benId: 'BEN-2026-002', benName: 'Sunil Kumar', stage: 'Stage 2 (Plinth)', amount: '₹ 20,000', status: 'FROZEN', inspectionApproved: false, dedupCleared: false },
+                { id: 'INST-303', benId: 'BEN-2026-005', benName: 'Mahesh Sharma', stage: 'Stage 2 (Plinth)', amount: '₹ 20,000', status: 'Pending Approval', inspectionApproved: true, dedupCleared: true },
+                { id: 'INST-304', benId: 'BEN-2026-008', benName: 'Geeta Rani', stage: 'Stage 3 (Lintel)', amount: '₹ 30,000', status: 'Pending Approval', inspectionApproved: true, dedupCleared: true }
+            ];
+
+            auditLogs = [];
+            logAuditEvent('SYSTEM_INIT', 'Preloaded practical rural housing & deduplication dataset initialized.');
+            
+            saveAllData();
+        }
+
+        function saveAllData() {
+            localStorage.setItem('gramtrack_beneficiaries', JSON.stringify(beneficiaries));
+            localStorage.setItem('gramtrack_projects', JSON.stringify(panchayatProjects));
+            localStorage.setItem('gramtrack_inspections', JSON.stringify(inspectionRecords));
+            localStorage.setItem('gramtrack_dedup', JSON.stringify(deduplicationQueue));
+            localStorage.setItem('gramtrack_instalments', JSON.stringify(instalmentQueue));
+            localStorage.setItem('gramtrack_audit', JSON.stringify(auditLogs));
+        }
+
+        function resetData() {
+            if (confirm('Are you sure you want to reset all data back to original state?')) {
+                localStorage.clear();
+                seedDemoData();
+                renderAllViews();
+                showModal('System Reset Complete', 'All beneficiary records, deduplication flags, and inspection evidence have been reset.');
+            }
+        }
+
+        function logAuditEvent(action, details) {
+            const entry = {
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                userId: currentUser ? currentUser.id : 'SYSTEM',
+                role: currentUser ? currentUser.role : 'System Engine',
+                action: action,
+                details: details,
+                hash: generateHashString(action + details)
+            };
+            auditLogs.unshift(entry);
+            if (auditLogs.length > 100) auditLogs.pop();
+            localStorage.setItem('gramtrack_audit', JSON.stringify(auditLogs));
+        }
+
+        // ================= NAVIGATION & TAB SWITCHING =================
+        function switchTab(tabKey) {
+            activeTab = tabKey;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-lavender-600', 'text-white');
+                btn.classList.add('text-textMuted');
+            });
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+
+            const activeBtn = document.getElementById(`nav-${tabKey}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-lavender-600', 'text-white');
+                activeBtn.classList.remove('text-textMuted');
+            }
+
+            const targetView = document.getElementById(`view-${tabKey}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            renderAllViews();
+            lucide.createIcons();
+        }
+
+        // ================= RENDERING LOGIC FOR ALL VIEWS =================
+        function renderAllViews() {
+            updateDashboardStats();
+            renderBeneficiaries();
+            renderDeduplicationQueue();
+            renderPanchayatProjects();
+            renderInspections();
+            renderInstalmentQueue();
+            renderAuditLog();
+            
+            // Deduplication badge counter
+            const pendingDedup = deduplicationQueue.filter(d => d.status === 'Action Required').length;
+            document.getElementById('dedupBadgeCount').innerText = pendingDedup;
+        }
+
+        // 1. DASHBOARD
+        function updateDashboardStats() {
+            document.getElementById('statTotalBeneficiaries').innerText = beneficiaries.length;
+            const flags = deduplicationQueue.filter(d => d.status === 'Action Required').length;
+            document.getElementById('statDuplicateFlags').innerText = `${flags} Pending`;
+            document.getElementById('statInspectionsCount').innerText = `${inspectionRecords.length} Geotagged`;
+
+            let totalDisbursed = beneficiaries.reduce((sum, b) => sum + (b.fundsDisbursed || 0), 0);
+            document.getElementById('statFundsDisbursed').innerText = `₹ ${totalDisbursed.toLocaleString('en-IN')}`;
+
+            // Render sample projects on dashboard
+            const grid = document.getElementById('dashboardPanchayatList');
+            grid.innerHTML = panchayatProjects.slice(0, 3).map(p => `
+                <div class="p-4 rounded-xl border border-lavender-200 bg-lavender-50/50 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold text-xs text-lavender-900">${p.name}</span>
+                        <span class="text-[10px] bg-lavender-200 text-lavender-800 font-semibold px-2 py-0.5 rounded-full">${p.status}</span>
+                    </div>
+                    <div class="text-[11px] text-textMuted">${p.village} • ${p.budget}</div>
+                    <div class="w-full bg-lavender-200 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-lavender-600 h-full" style="width: ${p.completion}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('chartConstructionStages');
+            if (!ctx) return;
+            
+            if (chartInstance) chartInstance.destroy();
+
+            const stageCounts = {
+                'Foundation': beneficiaries.filter(b => b.stage === 'Foundation').length,
+                'Plinth': beneficiaries.filter(b => b.stage === 'Plinth').length,
+                'Lintel': beneficiaries.filter(b => b.stage === 'Lintel').length,
+                'Completed': beneficiaries.filter(b => b.stage === 'Completed').length
+            };
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Foundation Stage', 'Plinth Stage', 'Lintel / Roof', 'Fully Completed'],
+                    datasets: [{
+                        label: 'Beneficiaries Count',
+                        data: [stageCounts.Foundation, stageCounts.Plinth, stageCounts.Lintel, stageCounts.Completed],
+                        backgroundColor: ['#B69EFE', '#9B7BFF', '#7654D6', '#10B981'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        // 2. BENEFICIARIES DIRECTORY
+        function filterBeneficiariesByStage(stage) {
+            currentFilterStage = stage;
+            document.querySelectorAll('.stage-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-lavender-600', 'text-white');
+            });
+            event.target.classList.add('bg-lavender-600', 'text-white');
+            renderBeneficiaries();
+        }
+
+        function renderBeneficiaries() {
+            const tbody = document.getElementById('beneficiaryTableBody');
+            const search = (document.getElementById('searchBeneficiary')?.value || '').toLowerCase();
+
+            const filtered = beneficiaries.filter(b => {
+                const matchesStage = (currentFilterStage === 'ALL' || b.stage === currentFilterStage);
+                const matchesSearch = b.name.toLowerCase().includes(search) || b.id.toLowerCase().includes(search) || b.village.toLowerCase().includes(search);
+                return matchesStage && matchesSearch;
+            });
+
+            tbody.innerHTML = filtered.map(b => {
+                let statusBadge = 'bg-emerald-100 text-emerald-800';
+                if (b.status.includes('Duplicate')) statusBadge = 'bg-rose-100 text-rose-800 font-bold';
+                else if (b.status.includes('Pending')) statusBadge = 'bg-amber-100 text-amber-800';
+
+                return `
+                    <tr class="hover:bg-lavender-50/50 transition">
+                        <td class="p-4">
+                            <div class="font-bold text-textMain">${b.name}</div>
+                            <div class="text-[10px] font-mono text-textMuted">${b.id} • ${b.schemeId}</div>
+                        </td>
+                        <td class="p-4 text-textMain">${b.village}</td>
+                        <td class="p-4 font-mono text-lavender-700">${b.aadhaarHash}</td>
+                        <td class="p-4">
+                            <span class="bg-lavender-100 text-lavender-800 px-2.5 py-1 rounded-full text-[11px] font-semibold">${b.stage}</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] ${statusBadge}">${b.status}</span>
+                        </td>
+                        <td class="p-4 font-bold text-textMain">₹ ${(b.fundsDisbursed||0).toLocaleString('en-IN')}</td>
+                        <td class="p-4 text-right space-x-1">
+                            <button onclick="viewBeneficiaryDetail('${b.id}')" class="px-2.5 py-1 bg-lavender-100 hover:bg-lavender-200 text-lavender-900 rounded-lg text-[11px] font-semibold">Details</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 3. DEDUPLICATION QUEUE
+        function renderDeduplicationQueue() {
+            const container = document.getElementById('dedupQueueList');
+            if (!container) return;
+
+            container.innerHTML = deduplicationQueue.map(item => {
+                const isCritical = item.riskLevel === 'CRITICAL';
+                const cardBg = isCritical ? 'border-rose-300 bg-rose-50/30' : 'border-amber-300 bg-amber-50/30';
+                
+                return `
+                    <div class="bg-white p-5 rounded-2xl border ${cardBg} shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isCritical ? 'bg-rose-600 text-white' : 'bg-amber-500 text-white'}">
+                                    ${item.riskLevel} (${item.confidenceScore}% Confidence)
+                                </span>
+                                <h3 class="font-bold text-sm text-textMain">${item.flagType} - Target Record: ${item.beneficiaryA.name}</h3>
+                            </div>
+                            <span class="text-xs font-mono text-textMuted">${item.id} • ${item.createdDate}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-white p-4 rounded-xl border border-lavender-200">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider font-bold text-textMuted block">Record A (Existing)</span>
+                                <div class="font-bold text-sm text-textMain mt-1">${item.beneficiaryA.name} (${item.beneficiaryA.id})</div>
+                                <div class="text-textMuted mt-0.5">Aadhaar: ${item.beneficiaryA.aadhaarHash} | GP: ${item.beneficiaryA.village}</div>
+                                <div class="text-textMuted">GPS: ${item.beneficiaryA.lat}, ${item.beneficiaryA.lng}</div>
+                            </div>
+                            <div class="border-t md:border-t-0 md:border-l border-lavender-200 pt-3 md:pt-0 md:pl-4">
+                                <span class="text-[10px] uppercase tracking-wider font-bold text-rose-600 block">Record B (Flagged Duplicate)</span>
+                                <div class="font-bold text-sm text-textMain mt-1">${item.beneficiaryB.name} (${item.beneficiaryB.id})</div>
+                                <div class="text-textMuted mt-0.5">Aadhaar: ${item.beneficiaryB.aadhaarHash} | GP: ${item.beneficiaryB.village}</div>
+                                <div class="text-textMuted">GPS: ${item.beneficiaryB.lat}, ${item.beneficiaryB.lng}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="font-bold text-textMuted">Conflicting Vectors:</span>
+                            ${item.matchingFields.map(f => `<span class="bg-lavender-100 text-lavender-800 px-2 py-0.5 rounded font-medium text-[11px]">${f}</span>`).join('')}
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between pt-2 border-t border-lavender-100 gap-2">
+                            <span class="text-xs text-textMuted font-medium">Resolution Status: <strong class="text-textMain">${item.status}</strong></span>
+                            
+                            <div class="flex items-center space-x-2">
+                                <button onclick="openDedupComparisonModal('${item.id}')" class="px-3 py-1.5 bg-lavender-100 text-lavender-900 rounded-xl text-xs font-bold hover:bg-lavender-200 transition">
+                                    Side-by-Side Compare
+                                </button>
+                                <button onclick="resolveDedupFlag('${item.id}', 'Mark Verified')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition">
+                                    Override & Mark Verified
+                                </button>
+                                <button onclick="resolveDedupFlag('${item.id}', 'Freeze Instalment')" class="px-3 py-1.5 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 transition">
+                                    Freeze Funds
+                                </button>
+                                <button onclick="resolveDedupFlag('${item.id}', 'Reject Duplicate')" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition">
+                                    Reject Duplicate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openDedupComparisonModal(dedupId) {
+            const item = deduplicationQueue.find(d => d.id === dedupId);
+            if (!item) return;
+
+            const modalBody = document.getElementById('dedupModalBody');
+            modalBody.innerHTML = `
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl text-xs text-rose-800 font-medium">
+                    Critical Warning: Multi-Factor scan identified <strong>${item.confidenceScore}% probability</strong> that Record B is a duplicate beneficiary entry.
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Record A -->
+                    <div class="p-4 bg-lavender-50 rounded-2xl border border-lavender-200 space-y-3">
+                        <span class="text-xs font-bold text-lavender-700 uppercase">Existing Beneficiary A</span>
+                        <div class="space-y-1 text-xs">
+                            <div><strong class="text-textMuted">Name:</strong> ${item.beneficiaryA.name}</div>
+                            <div><strong class="text-textMuted">Beneficiary ID:</strong> ${item.beneficiaryA.id}</div>
+                            <div><strong class="text-textMuted">Aadhaar (Hashed):</strong> <span class="bg-white px-2 py-0.5 rounded font-mono">${item.beneficiaryA.aadhaarHash}</span></div>
+                            <div><strong class="text-textMuted">Gram Panchayat:</strong> ${item.beneficiaryA.village}</div>
+                            <div><strong class="text-textMuted">GPS Location:</strong> ${item.beneficiaryA.lat}, ${item.beneficiaryA.lng}</div>
+                            <div><strong class="text-textMuted">Disbursed Funds:</strong> ₹ ${item.beneficiaryA.fundsDisbursed}</div>
+                        </div>
+                    </div>
+
+                    <!-- Record B -->
+                    <div class="p-4 bg-rose-50/50 rounded-2xl border border-rose-200 space-y-3">
+                        <span class="text-xs font-bold text-rose-700 uppercase">Flagged Applicant B</span>
+                        <div class="space-y-1 text-xs">
+                            <div><strong class="text-textMuted">Name:</strong> ${item.beneficiaryB.name}</div>
+                            <div><strong class="text-textMuted">Beneficiary ID:</strong> ${item.beneficiaryB.id}</div>
+                            <div><strong class="text-textMuted">Aadhaar (Hashed):</strong> <span class="bg-white px-2 py-0.5 rounded font-mono text-rose-600 font-bold">${item.beneficiaryB.aadhaarHash}</span></div>
+                            <div><strong class="text-textMuted">Gram Panchayat:</strong> ${item.beneficiaryB.village}</div>
+                            <div><strong class="text-textMuted">GPS Location:</strong> ${item.beneficiaryB.lat}, ${item.beneficiaryB.lng}</div>
+                            <div><strong class="text-textMuted">Disbursed Funds:</strong> ₹ ${item.beneficiaryB.fundsDisbursed}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <label class="text-xs font-bold text-textMain">Officer Audit Remarks (Mandatory for resolution)</label>
+                    <textarea id="dedupRemarks" rows="2" placeholder="e.g. Physical verification by District Nodal Officer confirms distinct biometric record..." class="w-full text-xs p-3 rounded-xl border border-lavender-200 focus:outline-none focus:ring-2 focus:ring-lavender-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-3 border-t border-lavender-100">
+                    <button onclick="resolveDedupFlag('${item.id}', 'Reject Duplicate')" class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700">Merge & Reject Record B</button>
+                    <button onclick="resolveDedupFlag('${item.id}', 'Mark Verified')" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700">Override & Mark Both Verified</button>
+                </div>
+            `;
+
+            document.getElementById('dedupModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeDedupModal() {
+            document.getElementById('dedupModal').classList.add('hidden');
+        }
+
+        function resolveDedupFlag(dedupId, actionType) {
+            const item = deduplicationQueue.find(d => d.id === dedupId);
+            if (!item) return;
+
+            item.status = `Resolved: ${actionType}`;
+            
+            if (actionType === 'Mark Verified') {
+                item.beneficiaryA.status = 'Verified';
+                item.beneficiaryB.status = 'Verified';
+            } else if (actionType === 'Reject Duplicate') {
+                item.beneficiaryB.status = 'Rejected Duplicate';
+            } else if (actionType === 'Freeze Instalment') {
+                item.beneficiaryB.status = 'Instalment Frozen';
+            }
+
+            logAuditEvent('DEDUP_RESOLVE', `Deduplication record ${dedupId} resolved with action '${actionType}' by user ${currentUser.id}`);
+            saveAllData();
+            closeDedupModal();
+            renderAllViews();
+            showModal('Action Recorded', `Deduplication flag ${dedupId} updated to: ${actionType}`);
+        }
+
+        function runDeduplicationScan() {
+            logAuditEvent('DEDUP_SCAN', `Full database multi-factor scan initiated by ${currentUser.id}`);
+            showModal('Multi-Factor Scan Complete', 'Scanned all 10 beneficiaries against 4 rule sets. Active flags updated in queue.');
+        }
+
+        // 4. PANCHAYAT WORKS
+        function renderPanchayatProjects() {
+            const grid = document.getElementById('panchayatProjectsGrid');
+            if (!grid) return;
+
+            grid.innerHTML = panchayatProjects.map(p => `
+                <div class="bg-white p-5 rounded-2xl border border-lavender-200 shadow-sm space-y-3 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-mono text-lavender-600 font-bold">${p.id}</span>
+                            <span class="bg-lavender-100 text-lavender-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">${p.status}</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-textMain mt-1">${p.name}</h3>
+                        <p class="text-xs text-textMuted">${p.village}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-textMuted font-medium">Physical Completion:</span>
+                            <span class="font-bold text-lavender-700">${p.completion}%</span>
+                        </div>
+                        <div class="w-full bg-lavender-100 h-2 rounded-full overflow-hidden">
+                            <div class="bg-lavender-600 h-full rounded-full transition-all duration-500" style="width: ${p.completion}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-lavender-100 flex justify-between items-center text-xs">
+                        <span class="font-bold text-textMain">${p.budget}</span>
+                        <span class="text-[11px] text-textMuted">Inspector: ${p.inspector}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 5. INSPECTION EVIDENCE GALLERY
+        function renderInspections() {
+            const gallery = document.getElementById('inspectionsGallery');
+            if (!gallery) return;
+
+            gallery.innerHTML = inspectionRecords.map(ins => `
+                <div class="bg-white rounded-2xl border border-lavender-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="relative">
+                        <img src="${ins.imageUrl}" alt="Inspection Evidence" class="w-full h-48 object-cover">
+                        <span class="absolute top-2 right-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                            ${ins.status}
+                        </span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-xs text-textMain">${ins.benName}</h4>
+                                <span class="text-[10px] text-lavender-600 font-bold">${ins.stage}</span>
+                            </div>
+                            <span class="text-[10px] text-textMuted font-mono">${ins.id}</span>
+                        </div>
+                        <p class="text-xs text-textMuted italic">"${ins.remarks}"</p>
+                        
+                        <div class="pt-2 border-t border-lavender-100 font-mono text-[10px] text-textMuted space-y-0.5">
+                            <div>GPS: ${ins.lat}° N, ${ins.lng}° E</div>
+                            <div>HMAC: ${ins.hash.substring(0, 18)}...</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 6. INSTALMENT QUEUE
+        function renderInstalmentQueue() {
+            const tbody = document.getElementById('instalmentTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = instalmentQueue.map(item => `
+                <tr class="hover:bg-lavender-50/50 transition">
+                    <td class="p-4">
+                        <div class="font-bold text-textMain">${item.benName}</div>
+                        <div class="text-[10px] font-mono text-textMuted">${item.benId}</div>
+                    </td>
+                    <td class="p-4 text-textMain font-medium">${item.stage}</td>
+                    <td class="p-4 font-bold text-lavender-900">${item.amount}</td>
+                    <td class="p-4">
+                        ${item.inspectionApproved ? 
+                            `<span class="text-emerald-600 font-bold flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> Stage Geotagged</span>` : 
+                            `<span class="text-amber-600 font-bold">Pending Inspection</span>`}
+                    </td>
+                    <td class="p-4">
+                        ${item.dedupCleared ? 
+                            `<span class="text-emerald-600 font-bold">Clear</span>` : 
+                            `<span class="text-rose-600 font-bold">Flag Pending</span>`}
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${item.status === 'Released' ? 'bg-emerald-100 text-emerald-800' : item.status === 'FROZEN' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        ${item.status !== 'Released' ? `
+                            <button onclick="releaseInstalment('${item.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] shadow">
+                                Release Disbursal
+                            </button>
+                        ` : '<span class="text-textMuted text-[10px]">Processed</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function releaseInstalment(instId) {
+            const item = instalmentQueue.find(i => i.id === instId);
+            if (!item) return;
+
+            if (!item.dedupCleared) {
+                showModal('Disbursal Blocked', 'Cannot release instalment while deduplication duplicate flags remain unresolved.');
+                return;
+            }
+
+            item.status = 'Released';
+            logAuditEvent('INSTALMENT_RELEASE', `Instalment ${instId} (${item.amount}) released to ${item.benName} by ${currentUser.id}`);
+            saveAllData();
+            renderAllViews();
+            showModal('Payment Released', `Fund amount ${item.amount} successfully credited to beneficiary bank account via direct DBT pipeline.`);
+        }
+
+        // 7. AUDIT LOGS
+        function renderAuditLog() {
+            const tbody = document.getElementById('auditTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = auditLogs.map(log => `
+                <tr class="hover:bg-lavender-50/50">
+                    <td class="p-3 text-textMuted">${log.timestamp}</td>
+                    <td class="p-3 font-bold text-textMain">${log.userId} (${log.role})</td>
+                    <td class="p-3 text-lavender-700 font-bold">${log.action}</td>
+                    <td class="p-3 text-textMain">${log.details}</td>
+                    <td class="p-3 text-lavender-500 font-mono">${log.hash}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportAuditLogJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `gramtrack_audit_log_${Date.now()}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        // ================= MOBILE FIELD INSPECTOR SIMULATOR =================
+        function toggleMobileSimulator() {
+            const sim = document.getElementById('mobileSimulator');
+            sim.classList.toggle('translate-x-full');
+            populateSimulatorSelects();
+        }
+
+        function populateSimulatorSelects() {
+            const sel = document.getElementById('simBeneficiarySelect');
+            if (!sel) return;
+            sel.innerHTML = beneficiaries.map(b => `<option value="${b.id}">${b.name} (${b.village})</option>`).join('');
+        }
+
+        function toggleMobileNetwork() {
+            isMobileOnline = !isMobileOnline;
+            const dot = document.getElementById('mobileNetworkDot');
+            const status = document.getElementById('mobileNetworkStatus');
+            const btn = document.getElementById('toggleNetBtn');
+            const queueBox = document.getElementById('offlineQueueContainer');
+
+            if (isMobileOnline) {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                status.className = 'font-bold text-emerald-400';
+                status.innerText = 'Online Sync Active';
+                btn.innerText = 'Simulate Offline';
+                
+                // Flush offline queue if any
+                if (offlineInspectionQueue.length > 0) {
+                    offlineInspectionQueue.forEach(record => {
+                        inspectionRecords.unshift(record);
+                        logAuditEvent('OFFLINE_SYNC', `Synced offline inspection record ${record.id} for ${record.benName}`);
+                    });
+                    offlineInspectionQueue = [];
+                    document.getElementById('offlineQueueCount').innerText = '0';
+                    queueBox.classList.add('hidden');
+                    saveAllData();
+                    renderAllViews();
+                    showModal('Offline Queue Synced', 'All inspections captured offline have been synced to the primary database.');
+                }
+            } else {
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+                status.className = 'font-bold text-amber-400';
+                status.innerText = 'Offline Mode Active';
+                btn.innerText = 'Restore Online';
+                queueBox.classList.remove('hidden');
+            }
+        }
+
+        function acquireBrowserGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        document.getElementById('simLat').innerText = pos.coords.latitude.toFixed(4) + '° N';
+                        document.getElementById('simLng').innerText = pos.coords.longitude.toFixed(4) + '° E';
+                        document.getElementById('simAcc').innerText = `± ${pos.coords.accuracy.toFixed(1)} meters`;
+                    },
+                    (err) => {
+                        showModal('GPS Fallback', 'Browser Geolocation unavailable or denied. Using high-accuracy simulated fallback coordinates.');
+                    }
+                );
+            }
+        }
+
+        function captureSimPhoto(type) {
+            const benId = document.getElementById('simBeneficiarySelect').value;
+            const ben = beneficiaries.find(b => b.id === benId) || beneficiaries[0];
+            const stage = document.getElementById('simStageSelect').value;
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+            const hash = generateHashString('MOBINSP');
+
+            simCapturedPhotoUrl = generateWatermarkedImageData(ben.id, stage, 26.8467, 80.9462, currentUser ? currentUser.id : 'INSPECTOR_SURESH', now, hash);
+            
+            const preview = document.getElementById('simPhotoPreview');
+            preview.innerHTML = `<img src="${simCapturedPhotoUrl}" class="w-full h-full object-cover">`;
+        }
+
+        function submitSimInspection() {
+            const benId = document.getElementById('simBeneficiarySelect').value;
+            const ben = beneficiaries.find(b => b.id === benId);
+            const stage = document.getElementById('simStageSelect').value;
+            const remarks = document.getElementById('simRemarks').value || 'Physical inspection verified on site.';
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+            if (!simCapturedPhotoUrl) {
+                captureSimPhoto('foundation');
+            }
+
+            const hash = generateHashString(benId + stage);
+            const newRecord = {
+                id: `INSP-${Math.floor(100 + Math.random() * 900)}`,
+                benId: ben.id,
+                benName: ben.name,
+                stage: stage,
+                inspectorId: currentUser ? currentUser.id : 'INSPECTOR_SURESH',
+                timestamp: now,
+                lat: 26.8467,
+                lng: 80.9462,
+                remarks: remarks,
+                imageUrl: simCapturedPhotoUrl,
+                hash: hash,
+                status: 'Approved'
+            };
+
+            if (isMobileOnline) {
+                inspectionRecords.unshift(newRecord);
+                logAuditEvent('FIELD_INSPECTION', `Inspection record ${newRecord.id} submitted for ${ben.name} (${stage})`);
+                saveAllData();
+                renderAllViews();
+                showModal('Inspection Submitted', 'Watermarked geotag image uploaded and verified with HMAC checksum.');
+            } else {
+                offlineInspectionQueue.push(newRecord);
+                document.getElementById('offlineQueueCount').innerText = offlineInspectionQueue.length;
+                showModal('Saved Offline', 'Inspection saved locally in device memory. It will sync automatically when back online.');
+            }
+
+            // Reset field
+            document.getElementById('simRemarks').value = '';
+            toggleMobileSimulator();
+        }
+
+        // ================= MODAL HELPERS =================
+        function showModal(title, text) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = `<p class="leading-relaxed text-textMain">${text}</p>`;
+            document.getElementById('globalModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('globalModal').classList.add('hidden');
+        }
+
+        function viewBeneficiaryDetail(benId) {
+            const b = beneficiaries.find(x => x.id === benId);
+            if (!b) return;
+
+            showModal(`Beneficiary Profile: ${b.name}`, `
+                <div class="space-y-2 text-xs">
+                    <div><strong>Beneficiary ID:</strong> ${b.id}</div>
+                    <div><strong>Scheme Registration:</strong> ${b.schemeId}</div>
+                    <div><strong>Gram Panchayat:</strong> ${b.village}</div>
+                    <div><strong>Current Stage:</strong> ${b.stage}</div>
+                    <div><strong>Aadhaar Hash:</strong> ${b.aadhaarHash}</div>
+                    <div><strong>Verification Status:</strong> ${b.status}</div>
+                    <div><strong>Total Disbursed:</strong> ₹ ${(b.fundsDisbursed||0).toLocaleString('en-IN')}</div>
+                    <div><strong>Coordinates:</strong> ${b.lat}° N, ${b.lng}° E</div>
+                </div>
+            `);
+        }
+
+        function openAddBeneficiaryModal() {
+            showModal('Add New Beneficiary', 'Use official portal registration form or import CSV list. (Demo Mode: Instant auto-generator active).');
+        }
+
+        function openAddPanchayatModal() {
+            showModal('New Panchayat Proposal', 'Panchayat Pradhan submission portal under 15th Finance Commission Grant.');
+        }
+
+        function dismissBanner() {
+            document.getElementById('topBanner').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
